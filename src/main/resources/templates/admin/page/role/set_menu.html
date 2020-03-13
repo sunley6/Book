@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title th:text="${title}"></title>
+
+<div th:include="/common/layui"></div>
+<div th:include="/common/jq"></div>
+
+<style>
+</style>
+
+</head>
+<script>
+//定义在外面。可以代码中  使用 table
+var tree;
+layui.use([ 'tree', 'laypage', 'layer','form', 'table', 'carousel',
+			'upload', 'element' ], function() {
+	tree = layui.tree;
+});
+
+function sub(){
+      var checkedData = tree.getChecked('demoTree'); //获取选中节点的数据
+      //layer.alert(JSON.stringify(checkedData), {shade:0});
+      var ids="";
+      if(checkedData.length>0){
+  		$.each(checkedData,function(i,val){
+  			ids = ids+val.id+",";
+  			//判断有没有children
+  			if(val.children){
+  				$.each(val.children,function(i,val){
+  		  			ids = ids+val.id+",";
+  				});
+  			}
+  			//判断有没有children
+  		});
+  	}
+	
+	//去掉最后的逗号 
+	ids = ids.substring(0,ids.length-1);
+	//去掉最后的逗号 
+    console.log(ids);
+	//提交ids到后台
+	var index = layer.msg('提交中，请稍候', {
+			icon : 16,
+			time : false,
+			shade : 0.8
+	});
+    $.post("/admin/role/updateMenu", {roleId:[[${role.id}]],menuIds:ids}, function(result) {
+    	layer.closeAll();
+		if (result.success) {
+			window.parent.closeDlg(result.msg);
+		} else {
+			layer.msg(result.msg);
+		}
+	}, 'json');
+	
+}
+
+</script>
+
+<body id="app">
+	<div id="tree" class="demo-tree-more"></div>
+	<div>    
+		<button onclick="sub()" type="button" class="layui-btn">提交</button>
+	</div>
+</body>
+
+<script>
+/*<![CDATA[*/
+	layui.use([ 'laydate', 'laypage', 'layer', 'table', 'carousel', 'upload',
+			'element','tree' ], function() {
+		var laydate = layui.laydate //日期
+		, laypage = layui.laypage //分页
+		, layer = layui.layer //弹层
+		, table = layui.table //表格
+		, carousel = layui.carousel //轮播
+		, upload = layui.upload //上传
+		,tree = layui.tree
+		, element = layui.element; //元素操作
+		
+		//模拟数据   , cascadeCheck:false  级联检查     ,isajax:true
+		$.post("/admin/role/getCheckedMenuData", {roleId:[[${role.id}]]}, function(result) {
+			 //基本演示
+			  tree.render({
+			    elem: '#tree'
+			    ,data: result
+			    ,showCheckbox: true  //是否显示复选框
+			    ,id: 'demoTree'
+			    ,isJump: true //是否允许点击节点时弹出新窗口跳转
+			     ,click: function(obj){
+			       var data = obj.data;  //获取当前点击的节点数据
+			       console.log('状态：'+ obj.state + '<br>节点数据：' + JSON.stringify(data));
+			     }
+			  });
+		     //tree.setChecked('demoId1', [1,2]); //勾选指定节点
+		}, 'json');
+		 
+		
+	});
+/*]]>*/
+</script>
+</html>

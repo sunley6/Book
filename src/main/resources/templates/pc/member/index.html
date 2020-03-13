@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>layout 后台大布局 - Layui</title>
+    <div th:include="/common/layui"></div>
+    <div th:include="/common/jq"></div>
+    <link href="/css/houtai/manage_base.css" rel="stylesheet"/>
+    <script src="/js/houtai/manage_base.js"></script>
+
+</head>
+
+<script>
+    //定义在外面。可以代码中  使用 table
+    var table;
+    layui.use(['laydate', 'laypage', 'layer', 'form', 'table', 'carousel',
+        'upload', 'element'], function () {
+        table = layui.table;
+    });
+
+    var global_ids;
+    var global_ids_len;
+
+    var w;//窗口的宽
+    var h;//窗口的高
+
+    //添加
+    function add() {
+        w = 600;
+        h = 500;
+        checkWindow();
+        //iframe层
+        layer.open({
+            type: 2,
+            title: '添加',
+            shadeClose: false,
+            shade: 0.8,
+            area: [w + 'px', h + 'px'],
+            content: '/houtai/book/add' //iframe的url
+        });
+    }
+
+    //打开编辑窗口
+    function edit(id) {
+        w = 600;
+        h = 500;
+        checkWindow();
+        layer.open({
+            type: 2,
+            title: '修改',
+            shadeClose: false,
+            shade: 0.8,
+            area: [w + 'px', h + 'px'],
+            content: '/houtai/book/booklook?id=' + id //iframe的url
+        });
+    }
+
+    function borrow(id) {
+        w = 600;
+        h = 500;
+        checkWindow();
+        layer.open({
+            type: 2,
+            title: '修改',
+            shadeClose: false,
+            shade: 0.8,
+            area: [w + 'px', h + 'px'],
+            content: '/houtai/book/bookborrow?id=' + id //iframe的url
+        });
+    }
+
+    //子窗口调用 的  关闭窗口方法
+    function closeDlg(msg) {
+        layer.closeAll();
+        layer.msg(msg);
+        reload_data();
+    }
+
+    //相当前刷新  重新加载
+    function reload_data() {
+        table.reload('table', {
+            where: {}, page: {
+                curr: 1 //重新从第 1 页开始
+            }
+        });
+    }
+
+
+    //  delSelected()     5     2,25,6,5
+    function del(ids) {
+        var index = layer.load(1, {
+            shade: [0.1, '#fff'] //0.1透明度的白色背景
+        });
+        $.post('/admin/book/delete', {ids: ids}, function (result) {
+            if (result.success) {
+                layer.closeAll();
+                layer.msg('删除成功');
+                reload_data();
+            } else {
+                layer.closeAll();
+                layer.alert('删除失败:' + result.msg);
+            }
+        }, 'json');
+    }
+
+
+</script>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">layui 后台布局</div>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+            <li class="layui-nav-item"><a href="">控制台</a></li>
+            <li class="layui-nav-item"><a href="">商品管理</a></li>
+            <li class="layui-nav-item"><a href="">用户</a></li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">其它系统</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">邮件管理</a></dd>
+                    <dd><a href="">消息管理</a></dd>
+                    <dd><a href="">授权管理</a></dd>
+                </dl>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+                    贤心
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">基本资料</a></dd>
+                    <dd><a href="">安全设置</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="">退了</a></li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="javascript:;">首页</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">解决方案</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;">列表一</a></dd>
+                        <dd><a href="javascript:;">列表二</a></dd>
+                        <dd><a href="">超链接</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item"><a href="">云市场</a></li>
+                <li class="layui-nav-item"><a href="">发布商品</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="padding: 15px;"><div style="width: 100% ; margin-top: 20px">
+            <div class="layui-input-inline" style="align-items: center">
+                <form class="layui-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">搜索条件</label>
+                        <div class="layui-input-inline">
+                            <select name="type" id="type" lay-filter="type">
+                                <option value="">请选择搜索类型</option>
+                                <option th:value="${type}" th:text="${type}" th:each="type: ${typelist}"></option>
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <input type="text" id="content" name="content" lay-verify="" placeholder="请输入搜索的信息"
+                                   autocomplete="off" class="layui-input">
+                        </div>
+                        <button class="layui-btn" id="BtnSearchUserInfo" type="button"><i class="layui-icon"
+                                                                                          style="font-size: 18px;color:white;">&#xe615;</i>搜索
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+            <table class="layui-hide" id="table" lay-filter="table"></table></div>
+    </div>
+
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        © layui.com - 底部固定区域
+    </div>
+</div>
+
+<script type="text/html" id="table_bar">
+
+    <div class="layui-btn-group">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">查看</a>
+    </div>
+    <div class="layui-btn-group">
+        <a class="layui-btn layui-btn-xs" lay-event="borrow">借阅</a>
+    </div>
+    <div class="layui-btn-group">
+        <a class="layui-btn layui-btn-xs" lay-event="pre_borrow">预借</a>
+    </div>
+</script>
+
+
+
+<script type="text/html" id="format_type">
+    {{#  if(d.bookType){ }}
+    {{d.bookType.name}}
+    {{#  } else {  }}
+    <span style="color: #f53e3d;">待审核</span>
+    {{#  }   }}
+</script>
+<script type="text/html" id="imgtmp">
+    <img src="{{d.imageUrl}}" >
+</script>
+<script>
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel',
+        'upload', 'element', 'form'], function () {
+        var laydate = layui.laydate //日期
+            , laypage = layui.laypage //分页
+            , layer = layui.layer //弹层
+            , table = layui.table //表格
+            , carousel = layui.carousel //轮播
+            , upload = layui.upload //上传
+            , element = layui.element
+            , form = layui.form; //元素操作
+
+        // form.on('select(gridding)',function (data) {
+        // 	var seone = data.value;
+        //     $.ajax({
+        //         type:"POST",
+        //         url:'/admin/book/type/searchlist',
+        //         dataType:"json",
+        // 		contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        // 		data: {
+        // 			csq: seone
+        // 		},
+        //         success:function (data) {
+        //             console.log(data);
+        // 			if (data.code == 0) {
+        // 				$("#gridding").empty();
+        // 				$.each(data.data, function(index, item) {
+        // 					$('#gridding').append(new Option(item));
+        // 				});
+        // 			} else {
+        // 				$("#gridding").append(new Option("暂无数据", ""));
+        // 			}
+        // 			layui.form.render("select");
+        //
+        //         }
+        //     })
+        //
+        // })
+
+
+        table.render({
+            elem: '#table'
+            , url: '/admin/book/list'
+            , height: 'full-40'
+            , toolbar: '#toolbardemo'
+            , totalRow: true
+            , defaultToolbar: ['filter', 'exports', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                , layEvent: 'LAYTABLE_TIPS'
+                , icon: 'layui-icon-tips'
+            }]
+            , cols: [
+                [
+
+                    {field: 'id', title: 'ID', width: 60, style: 'font-size: 12px;'}
+                    , {field: 'name', title: '图书名称', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'bookType', title: '图书类型', width: 90, style: 'font-size: 12px;', templet: '#format_type'}
+                    , {field: 'author', title: '作者', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'danjia', title: '单价', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'press', title: '出版社', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'num', title: '数量', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'bookLocation', title: '存放位置', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'introduce', title: '简介', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'imageUrl', title: '封面图', width: 150, style: 'font-size: 12px;', templet: '#imgtmp'}
+                    , {fixed: '', width: 120, title: '操作', toolbar: '#table_bar'}
+                ]
+            ]
+            , id: 'table'
+            , page: true
+            , limits: [5],
+            limit: 5
+        });
+
+        $("#BtnSearchUserInfo").on("click", function () {
+            table.reload('table', {
+                where: { //查询条件，传值到后台
+                    type: $("#type").val(),
+                    content: $("#content").val(),
+                }
+            })
+        });
+        var ids = new Array();
+        //当前表格中的全部数据:在表格的checkbox全选的时候没有得到数据, 因此用全局存放变量
+        var table_data = new Array();
+        //监听工具条 table_bar
+        table.on('tool(table)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data //获得当前行数据
+                , layEvent = obj.event; //获得 lay-event 对应的值
+            if (layEvent === 'edit') {
+                edit(data.id);
+            }
+            if (layEvent === 'borrow') {
+                borrow(data.id);
+            }
+            if (layEvent === 'pre_borrow') {
+                preborrow(data.id);
+            }
+        });
+        //监听工具条 table_bar
+
+
+        //监听单元格编辑
+        table.on('edit(table)', function (obj) {
+            var value = obj.value //得到修改后的值
+                , data = obj.data //得到所在行所有键值
+                , field = obj.field; //得到字段  orderNo  name
+            //layer.msg('[ID: '+ data.id +'] ' + field + ' 字段更改为：'+ value);
+            table_edit_update(data.id, field, value);
+        });
+
+        table.on('checkbox(table)', function (obj) {
+            var checkStatus = table.checkStatus('table'); //idTest 即为基础参数 id 对应的值
+            console.log(obj);
+
+            console.log(checkStatus);
+
+        })
+
+
+    });
+</script>
+<style type="text/css">
+    .layui-table-cell {
+        height: auto;
+
+    }
+    .layui-icon{
+        margin-top: 5px;
+    }
+</style>
+</body>
+</html>
