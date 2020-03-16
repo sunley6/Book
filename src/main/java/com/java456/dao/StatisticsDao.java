@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface StatisticsDao  extends JpaRepository<Statistics,Integer>, JpaSpecificationExecutor<Statistics> {
 
-    @Query(value="select * from t_book where id = ?1",nativeQuery = true)
-    public Statistics  findId(Integer id);
+    @Query(value="select * from t_book_statistics where bianhao = ?1",nativeQuery = true)
+    public Statistics  findId(String id);
 }

@@ -41,18 +41,46 @@
     }
 
     //打开编辑窗口
-    function edit(id) {
-        w = 600;
-        h = 500;
-        checkWindow();
-        layer.open({
-            type: 2,
-            title: '修改',
-            shadeClose: false,
-            shade: 0.8,
-            area: [w + 'px', h + 'px'],
-            content: '/houtai/book/booklook?id=' + id //iframe的url
-        });
+    // function edit(id) {
+    //     w = 600;
+    //     h = 500;
+    //     checkWindow();
+    //     layer.open({
+    //         type: 2,
+    //         title: '修改',
+    //         shadeClose: false,
+    //         shade: 0.8,
+    //         area: [w + 'px', h + 'px'],
+    //         content: '/houtai/book/booklook?id=' + id //iframe的url
+    //     });
+    // }
+
+    function check_borrow(id) {
+
+
+        $.post('/admin/book/check_preborrow', {'id':id
+        }, function(result) {
+            if (result.success) {
+                layer.alert( result.msg);
+                reload_data();
+                window.parent.closeDlg(result.msg);
+            } else {
+                layer.msg(result.msg);
+            }
+        }, 'json');
+    }
+
+    function sure_borrow(id) {
+        $.post('/admin/book/sure_preborrow', {'id':id
+        }, function(result) {
+            if (result.success) {
+                layer.alert( result.msg);
+                reload_data();
+                window.parent.closeDlg(result.msg);
+            } else {
+                layer.msg(result.msg);
+            }
+        }, 'json');
     }
 
 
@@ -71,6 +99,20 @@
                 curr: 1 //重新从第 1 页开始
             }
         });
+    }
+
+    function book_return(id) {
+
+        $.post('/admin/book/bookreturn', {'id':id
+        }, function (result) {
+            if (result.success) {
+                layer.alert( result.msg);
+                reload_data();
+                window.parent.closeDlg(result.msg);
+            } else {
+                layer.msg(result.msg);
+            }
+        }, 'json');
     }
 
 
@@ -128,13 +170,19 @@
 
 <script type="text/html" id="table_bar">
 
+
     <div class="layui-btn-group">
-        <a class="layui-btn layui-btn-xs" lay-event="edit">查看</a>
+        <a class="layui-btn layui-btn-xs" lay-event="checkborrow">审核</a>
+    </div>
+
+    <div class="layui-btn-group">
+        <a class="layui-btn layui-btn-xs" lay-event="sureborrow">确认</a>
     </div>
 
     <div class="layui-btn-group">
         <a class="layui-btn layui-btn-xs" lay-event="return">归还</a>
     </div>
+
 </script>
 
 <script type="text/html" id="format_type">
@@ -152,8 +200,12 @@
     <span style="color:red;">待审核</span>
     {{#  } else if(d.state===3) { }}
     <span style="color:saddlebrown;">已预借</span>
-    {{#  } else  { }}
+    {{#  } else if(d.state===4) { }}
+    <span style="color:#0000FF;">待领取</span>
+    {{#  } else if(d.state===5) { }}
     <span style="color:#18d26e">已归还</span>
+    {{#  } else if(d.state===6) { }}
+    <span style="color:aqua;">已续借</span>
     {{#  }   }}
 </script>
 <script type="text/html" id="imgtmp">
@@ -230,7 +282,7 @@
                     , {field: 'borrowCreateDateTime', title: '借阅时间', width: 140, style: 'font-size: 12px;'}
                     , {field: 'borrowLastDateTime', title: '归还时间', width: 140, style: 'font-size: 12px;'}
                     , {field: 'state', title: '归还时间', width: 140, style: 'font-size: 12px;', templet: '#statustmp'}
-                    , {fixed: '', width: 180, title: '操作', toolbar: '#table_bar'}
+                    , {fixed: '', width: 220, title: '操作', toolbar: '#table_bar'}
                 ]
             ]
             , id: 'table'
@@ -257,7 +309,7 @@
             if (layEvent === 'edit') {
                 edit(data.id);
             }
-            else if (layEvent==='checkborroe') {
+            else if (layEvent==='checkborrow') {
                 check_borrow(data.id);
             } else if (layEvent==='sureborrow') {
                 sure_borrow(data.id);

@@ -13,6 +13,7 @@ import com.java456.dao.*;
 import com.java456.entity.*;
 import com.java456.service.BookBorrowService;
 import com.java456.service.BookTypeService;
+
 import com.java456.util.GetDate;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.data.domain.Page;
@@ -164,8 +165,11 @@ public class Admin_Book_Controoler {
 
 
 		for (int i = 0; i < idsStr.length; i++) {
-			Statistics statistics=statisticsDao.findId(Integer.parseInt(idsStr[i]));
+
+			Book book=bookDao.findId(Integer.parseInt(idsStr[i]));
+			Statistics statistics=statisticsDao.findId(book.getBianhao());
 			statistics.setState(0);
+			System.out.println(statistics);
 			statisticsDao.save(statistics);
 			bookDao.deleteById(Integer.parseInt(idsStr[i]));
 
@@ -189,7 +193,7 @@ public class Admin_Book_Controoler {
 		Book book=bookDao.findId(id);
 		User user=userDao.findByPhone(userPhone);
 		BookBorrow bookBorrow=new BookBorrow(user,book,new Date(),date,1);
-		BookBorrow bookBorrow1=bookBorrowDao.findIdUid(id,user.getId());
+		BookBorrow bookBorrow1=bookBorrowDao.findIdUid(id,user.getId(),5);
 //		if (currentUser==null){
 //			result.put("success", false);
 //			result.put("msg", "请先登录");
@@ -211,6 +215,7 @@ public class Admin_Book_Controoler {
 			return result;
 		}
 		else {
+				System.out.println("borrowfenjsanu+"+user.getCredit());
 			book.setNum(book.getNum()-1);
 			bookService.update(book);
 			bookBorrowDao.save(bookBorrow);
@@ -220,6 +225,57 @@ public class Admin_Book_Controoler {
 		}
 
 	}
+
+	@ResponseBody
+	@RequestMapping( value = "/preborrow",method = {RequestMethod.POST})
+	public JSONObject preborrow(
+			@Valid  BookBorrow bookBorrow,
+			@RequestParam(value = "datenum", required = false) Integer datenum,
+			HttpServletRequest request) throws Exception {
+		JSONObject result = new JSONObject();
+        System.out.println(bookBorrow);
+		GetDate getDate=new GetDate();
+		Date date=getDate.getlastdate(datenum);
+		Book book=bookDao.findId(bookBorrow.getBookId());
+		User currentUser = userDao.findId(bookBorrow.getuId().getId());
+		BookBorrow bookBorrow1=bookBorrowDao.findIdUid(bookBorrow.getBookId(),currentUser.getId(),5);
+		if (currentUser==null){
+			result.put("success", false);
+			result.put("msg", "请先登录");
+			return result;
+		}else
+		if (book.getNum()<1){
+			result.put("success", false);
+			result.put("msg", "数量不足");
+			return result;
+		}
+		else if (bookBorrow1!=null){
+			System.out.println(bookBorrow1);
+			result.put("success", false);
+			result.put("msg", "书籍已借阅");
+			return result;
+		}
+		else if (currentUser.getCredit()<70){
+			result.put("success", false);
+			result.put("msg", "信用分不足");
+			return result;
+		}
+		else {
+//			book.setNum(book.getNum()-1);
+//			bookService.update(book);
+			System.out.println("分“+”"+currentUser.getCredit());
+			bookBorrow.setState(2);
+			bookBorrow.setBorrowCreateDateTime(new Date());
+			bookBorrow.setBorrowLastDateTime(date);
+            System.out.println(bookBorrow);
+			bookBorrowDao.save(bookBorrow);
+			result.put("success", true);
+			result.put("msg", "添加成功");
+			return result;
+		}
+
+	}
+
 
 
 	@ResponseBody
@@ -260,14 +316,14 @@ public class Admin_Book_Controoler {
 	}
 
 	@ResponseBody
-	@RequestMapping( value = "/bookreturn",method = {RequestMethod.POST})
-	public JSONObject bookreturn( @RequestParam(value = "id", required = false) Integer id,
-
+	@RequestMapping( value = "/check_preborrow",method = {RequestMethod.POST})
+	public JSONObject check_preborrow( @RequestParam(value = "id", required = false) Integer id,
 									HttpServletRequest request) throws Exception {
 		JSONObject result = new JSONObject();
 
 		BookBorrow bookBorrow=bookBorrowDao.findId1(id);
-		bookBorrow.setState(5);
+		System.out.println(bookBorrow);
+		bookBorrow.setState(3);
 		User currentUser = (User)SecurityUtils.getSubject().getSession().getAttribute("currentUser");
 
 		if (currentUser==null){
@@ -282,6 +338,78 @@ public class Admin_Book_Controoler {
 		}
 		else {
 
+			bookBorrow.setBorrowCreateDateTime(new Date());
+			System.out.println(bookBorrow);
+			bookBorrowService.update(bookBorrow);
+			result.put("success", true);
+			result.put("msg", "审核通过");
+			return result;
+		}
+
+	}
+
+	@ResponseBody
+	@RequestMapping( value = "/sure_preborrow",method = {RequestMethod.POST})
+	public JSONObject sure_preborrow( @RequestParam(value = "id", required = false) Integer id,
+									   HttpServletRequest request) throws Exception {
+		JSONObject result = new JSONObject();
+		GetDate getDate=new GetDate();
+
+		BookBorrow bookBorrow=bookBorrowDao.findId1(id);
+		int datemu=getDate.differentDaysByMillisecond(bookBorrow.getBorrowCreateDateTime(),bookBorrow.getBorrowLastDateTime());
+		Date date=getDate.getcontinuelastdate(new Date(),datemu+1);
+		System.out.println(bookBorrow);
+		bookBorrow.setState(1);
+		User currentUser = (User)SecurityUtils.getSubject().getSession().getAttribute("currentUser");
+
+//		if (currentUser==null){
+//			result.put("success", false);
+//			result.put("msg", "请先登录");
+//			return result;
+//		}
+//		else
+			if (currentUser.getCredit()<70){
+			result.put("success", false);
+			result.put("msg", "信用分不足");
+			return result;
+		}
+		else {
+
+			bookBorrow.setBorrowCreateDateTime(new Date());
+			bookBorrow.setBorrowLastDateTime(date);
+			System.out.println(bookBorrow);
+			bookBorrowService.update(bookBorrow);
+			result.put("success", true);
+			result.put("msg", "借阅成功");
+			return result;
+		}
+
+	}
+
+	@ResponseBody
+	@RequestMapping( value = "/bookreturn",method = {RequestMethod.POST})
+	public JSONObject bookreturn( @RequestParam(value = "id", required = false) Integer id,
+
+									HttpServletRequest request) throws Exception {
+		JSONObject result = new JSONObject();
+
+		BookBorrow bookBorrow=bookBorrowDao.findId1(id);
+		bookBorrow.setState(5);
+		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
+		List<BookBorrow> list = new ArrayList<>();
+		list=bookBorrowDao.findByUId(bookBorrow.getuId().getId());
+		System.out.println(list.size());
+		GetDate getDate=new GetDate();
+		getDate.compDate(sd.format(bookBorrow.getBorrowLastDateTime()));
+		int overDay=getDate.compDate(sd.format(bookBorrow.getBorrowLastDateTime()));
+			User user=userDao.findId(bookBorrow.getuId().getId());
+			if (overDay<=0){
+
+			}else if (overDay<4){
+				user.setCredit(user.getCredit()-overDay*10);
+			}else{
+				user.setCredit(user.getCredit()-40);
+			}
 			bookBorrowService.update(bookBorrow);
 			Book book=bookDao.findId(bookBorrow.getBookId());
 			book.setNum(book.getNum()+1);
@@ -289,7 +417,7 @@ public class Admin_Book_Controoler {
 			result.put("success", true);
 			result.put("msg", "归还成功");
 			return result;
-		}
+
 
 	}
 

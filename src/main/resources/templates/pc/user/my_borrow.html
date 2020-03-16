@@ -68,17 +68,7 @@
             content: '/houtai/book/bookcontinue?id=' + id //iframe的url
         });
     }
-    function book_return(id) {
 
-        $.post('/admin/book/bookreturn', {'id':id
-        }, function (result) {
-            if (result.success) {
-                window.parent.closeDlg(result.msg);
-            } else {
-                layer.msg(result.msg);
-            }
-        }, 'json');
-    }
 
 
 
@@ -193,7 +183,6 @@
     <span style="color: #f53e3d;"></span>
     {{#  }   }}
 </script>
-
 <script type="text/html" id="statustmp">
     {{#  if(d.state===1){ }}
     <span style="color: darkslategrey;">已借阅</span>
@@ -201,9 +190,11 @@
     <span style="color:red;">待审核</span>
     {{#  } else if(d.state===3) { }}
     <span style="color:saddlebrown;">已预借</span>
-    {{#  } else  { }}
+    {{#  } else if(d.state===4) { }}
+    <span style="color:#0000FF;">待领取</span>
+    {{#  } else if(d.state===5) { }}
     <span style="color:#18d26e">已归还</span>
-    else if(d.state===5) { }}
+    {{#  } else if(d.state===6) { }}
     <span style="color:aqua;">已续借</span>
     {{#  }   }}
 </script>

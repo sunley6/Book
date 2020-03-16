@@ -29,6 +29,6 @@ public interface BookBorrowDao extends JpaRepository<BookBorrow,Integer>,JpaSpec
 	@Query(value="select * from t_book_borrow where user_id = ?1",nativeQuery = true)
      public List<BookBorrow> findByUId(Integer id);
 
-	@Query(value="select * from t_book_borrow where book_id = ?1 and user_id =?2",nativeQuery = true)
-	BookBorrow findIdUid(@Param(value = "id") Integer id,@Param(value = "user_id") int userId );
+	@Query(value="select * from t_book_borrow where book_id = ?1 and user_id =?2 and state!=?3",nativeQuery = true)
+	BookBorrow findIdUid(@Param(value = "id") Integer id,@Param(value = "user_id") int userId ,@Param(value = "state") Integer state);
 }

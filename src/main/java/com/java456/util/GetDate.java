@@ -24,11 +24,21 @@ public class GetDate {
         return date;
     }
 
-    public boolean compDate(String str) throws ParseException {
+    public int compDate(String str) throws ParseException {
         SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         sd.format(date);
-        return sd.parse(sd.format(date)).before(sd.parse(str));
+        Date date1=new Date();
+        date1=sd.parse(str);
+        return (int) ((date.getTime() - date1.getTime()) / (1000*3600*24));
+    }
+
+    public  int differentDaysByMillisecond(Date date1,Date date2)
+    {
+
+        int days = (int) ((date2.getTime() - date1.getTime()) / (1000*3600*24));
+
+        return days;
     }
 
 

@@ -196,11 +196,6 @@ public class HouTai_Book_Controller {
 	}
 
 
-
-
-
-
-
 	@RequestMapping("/bookcontinue")
 	public ModelAndView bookcontinue(@RequestParam(value = "id", required = false) Integer id) throws Exception {
 
