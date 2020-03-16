@@ -16,6 +16,9 @@ public interface UserDao extends JpaRepository<User,Integer>,JpaSpecificationExe
 
     @Query(value="select * from t_b_user where id = ?1",nativeQuery = true)
 	public User findId(Integer id);
+
+    @Query(value="select * from t_b_user where phone = ?1",nativeQuery = true)
+    public User findByPhone(String phone);
 	
 	public User findByName(String name);
 	

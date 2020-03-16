@@ -21,7 +21,7 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     var save_url = [[${save_url}]];
-
+    var id   = [[${id}]];
     function save() {
         var index = layer.msg('提交中，请稍候', {
             icon: 16,
@@ -30,12 +30,12 @@
         });
         var datenum = $("#datenum").val();
         var n1=$("#bookType").val();
-        console.log("n1="+n1);
         $.post(save_url, {
-            bookName: app.bookName, orderNo: app.orderNo, bookPress: app.bookPress,
-            bookLocation: app.bookLocation, bookAuthor: app.bookAuthor, bookBianhao: app.bookBianhao
-            , bookType: app.bookType, introduce: app.introduce, bookImageUrl: app.bookImageUrl
-            , userId: app.userId, userPhone: app.userPhone, userName: app.userName,'datenum':datenum
+            // bookName: app.bookName, orderNo: app.orderNo, bookPress: app.bookPress,num:app.num,bookId:app.bookId,
+            // bookLocation: app.bookLocation, bookAuthor: app.bookAuthor, bookBianhao: app.bookBianhao
+            // , bookType: app.bookType, introduce: app.introduce, bookImageUrl: app.bookImageUrl
+            // , uId: app.uId,  userName: app.userName,
+            userPhone: app.userPhone,'datenum':datenum,'id':id
         }, function (result) {
             if (result.success) {
                 window.parent.closeDlg(result.msg);
@@ -61,6 +61,17 @@
             </select>
         </div>
     </div>
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户电话</label>
+        <div class="layui-input-block">
+            <input type="text" v-model="userPhone"  autocomplete="off"
+                   class="layui-input">
+        </div>
+    </div>
+
+
     <div class="layui-form-item">
         <div class="layui-input-block">
             <button class="layui-btn" th:text="${btn_text}" lay-submit="" lay-filter="demo1"
@@ -68,81 +79,92 @@
             </button>
         </div>
     </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <input type="hidden" v-model="bookName" th:value="${book?.name}" autocomplete="off"
-                   class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <input type="hidden" v-model="bookType" id="bookType" th:value="${bookType?.name}" autocomplete="off"
-                   class="layui-input">
-        </div>
-    </div>
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="bookName" th:value="${book?.name}" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="bookType" id="bookType" th:value="${bookType?.name}" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <input type="hidden" v-model="bookPress" th:value="${book?.press}" autocomplete="off"
-                   class="layui-input">
-        </div>
-    </div>
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="bookPress" th:value="${book?.press}" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <input type="hidden" v-model="bookAuthor" th:value="${book?.author}" autocomplete="off"
-                   class="layui-input">
-        </div>
-    </div>
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="bookId" th:value="${book?.id}" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <input type="hidden" v-model="bookLocation" th:value="${book?.bookLocation}" autocomplete="off"
-                   class="layui-input">
-        </div>
-    </div>
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="bookAuthor" th:value="${book?.author}" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <input type="hidden" v-model="bookBianhao" th:value="${book?.bianhao}" autocomplete="off"
-                   class="layui-input">
-        </div>
-    </div>
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="bookLocation" th:value="${book?.bookLocation}" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <input type="hidden" v-model="introduce" th:value="${book?.Introduce}" autocomplete="off"
-                   class="layui-input">
-        </div>
-    </div>
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="bookBianhao" th:value="${book?.bianhao}" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <input type="hidden" v-model="bookImageUrl" th:value="${book?.imageUrl}" autocomplete="off"
-                   class="layui-input">
-        </div>
-    </div>
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="introduce" th:value="${book?.Introduce}" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="num" th:value="1" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <input type="hidden" v-model="userName" th:value="${session.currentUser.name}" autocomplete="off"
-                   class="layui-input">
-        </div>
-    </div>
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <input type="hidden" v-model="userId" th:value="${session.currentUser.id}" autocomplete="off"
-                   class="layui-input">
-        </div>
-    </div>
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <input type="hidden" v-model="userPhone" th:value="${session.currentUser.phone}" autocomplete="off"
-                   class="layui-input">
-        </div>
-    </div>
+
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="bookImageUrl" th:value="${book?.imageUrl}" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="userName" th:value="${session.currentUser.name}" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <div class="layui-form-item">-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="hidden" v-model="uId" th:value="${session.currentUser.id}" autocomplete="off"-->
+<!--                   class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
+
+
 
 
 
@@ -159,7 +181,10 @@
             , table = layui.table //表格
             , carousel = layui.carousel //轮播
             , upload = layui.upload //上传
-            , element = layui.element; //元素操作
+            , element = layui.element //元素操作
+             , form = layui.form; //元素操作
+
+
 
     });
 </script>

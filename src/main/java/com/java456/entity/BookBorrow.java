@@ -17,14 +17,18 @@ public class BookBorrow {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(length=20)
-    private Integer userId; // 用户Id
+    @ManyToOne
+    @JoinColumn(name="userId")
+    private User uId; // 用户Id
 
     @Column(length=20)
     private String userName; // 用户名称
 
     @Column(length=20)
     private String userPhone; // 联系方式
+
+    @Column(length=50)
+    private Integer bookId; //图书名称
 
     @Column(length=50)
     private String bookName; //图书名称
@@ -45,8 +49,6 @@ public class BookBorrow {
     private String Introduce; //简介
 
 
-    @Column(length = 10,columnDefinition = "int default 1")
-    private Integer orderNo;//排序号
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date borrowCreateDateTime;//借阅时间
@@ -76,12 +78,12 @@ public class BookBorrow {
         this.id = id;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public User getuId() {
+        return uId;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setuId(User uId) {
+        this.uId = uId;
     }
 
     public String getUserName() {
@@ -148,13 +150,14 @@ public class BookBorrow {
         Introduce = introduce;
     }
 
-    public Integer getOrderNo() {
-        return orderNo;
+    public Integer getBookId() {
+        return bookId;
     }
 
-    public void setOrderNo(Integer orderNo) {
-        this.orderNo = orderNo;
+    public void setBookId(Integer bookId) {
+        this.bookId = bookId;
     }
+
     @JsonSerialize(using = CustomDateTimeSerializer.class)
     public Date getBorrowCreateDateTime() {
         return borrowCreateDateTime;
@@ -204,11 +207,36 @@ public class BookBorrow {
         this.state = state;
     }
 
+    public BookBorrow() {
+
+    }
+
+
+
+    public BookBorrow(User user,Book book,Date borrowCreateDateTime,Date borrowLastDateTime,Integer state) {
+        this.uId = user;
+        this.userName = user.getName();
+        this.userPhone = user.getPhone();
+        this.bookId = book.getId();
+        this.bookName = book.getName();
+        this.bookAuthor = book.getAuthor();
+        this.bookPress = book.getPress();
+        this.bookBianhao = book.getBianhao();
+        this.bookLocation = book.getBookLocation();
+        Introduce = book.getIntroduce();
+        this.borrowCreateDateTime = borrowCreateDateTime;
+        this.borrowLastDateTime = borrowLastDateTime;
+        this.bookImageUrl = book.getImageUrl();
+        this.num = 1;
+        this.bookType = book.getBookType().getName();
+        this.state = state;
+    }
+
     @Override
     public String toString() {
         return "BookBorrowService{" +
                 "id=" + id +
-                ", userId=" + userId +
+                ", userId=" + uId +
                 ", userName=" + userName +
                 ", userPhone=" + userPhone +
                 ", bookName=" + bookName +
@@ -217,7 +245,6 @@ public class BookBorrow {
                 ", bookBianhao=" + bookBianhao +
                 ", bookLocation=" + bookLocation +
                 ", Introduce=" + Introduce +
-                ", orderNo=" + orderNo +
                 ", borrowCreateDateTime=" + borrowCreateDateTime +
                 ", borrowLastDateTime=" + borrowLastDateTime +
                 ", bookImageUrl=" + bookImageUrl +

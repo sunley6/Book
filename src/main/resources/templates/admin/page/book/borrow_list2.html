@@ -75,19 +75,6 @@
         });
     }
 
-    function borrow(id) {
-        w = 600;
-        h = 500;
-        checkWindow();
-        layer.open({
-            type: 2,
-            title: '修改',
-            shadeClose: false,
-            shade: 0.8,
-            area: [w + 'px', h + 'px'],
-            content: '/houtai/book/bookborrow?id=' + id //iframe的url
-        });
-    }
 
     //  delSelected()     5     2,25,6,5
     function del(ids) {
@@ -122,13 +109,11 @@
         </div>
     </div>
 </script>
-
 <div style="width: 100% ; margin-top: 20px">
     <div class="layui-input-inline" style="align-items: center">
         <form class="layui-form">
             <div class="layui-form-item">
-                <label class="layui-form-label" >搜索条件</label>
-
+                <label class="layui-form-label">搜索条件</label>
                 <div class="layui-input-inline">
                     <select name="type" id="type" lay-filter="type">
                         <option value="">请选择搜索类型</option>
@@ -153,9 +138,6 @@
     <div class="layui-btn-group">
         <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
     </div>
-    <div class="layui-btn-group">
-        <a class="layui-btn layui-btn-xs" lay-event="borrow">借阅</a>
-    </div>
 </script>
 
 <script type="text/html" id="format_type">
@@ -166,7 +148,7 @@
     {{#  }   }}
 </script>
 <script type="text/html" id="imgtmp">
-    <img src="{{d.imageUrl}}" >
+    <img src="{{d.imageUrl}}" style="width: 90px; height: 50px">
 </script>
 <script>
     layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel',
@@ -221,7 +203,7 @@
             }]
             , cols: [
                 [
-                    {checkbox: true}
+                    {checkbox: true, fixed: true}
                     , {field: 'id', title: 'ID', width: 60, style: 'font-size: 12px;'}
                     , {field: 'orderNo', title: '排序号', width: 60, style: 'font-size: 12px;'}
                     , {field: 'bianhao', title: '图书编号', width: 90, style: 'font-size: 12px;'}
@@ -234,24 +216,21 @@
                     , {field: 'num', title: '数量', width: 90, style: 'font-size: 12px;'}
                     , {field: 'bookLocation', title: '存放位置', width: 90, style: 'font-size: 12px;'}
                     , {field: 'introduce', title: '简介', width: 90, style: 'font-size: 12px;'}
-                    , {field: 'imageUrl', title: '封面图', width: 150, style: 'font-size: 12px;', templet: '#imgtmp'}
+                    , {field: 'imageUrl', title: '封面图', width: 90, style: 'font-size: 12px;', templet: '#imgtmp'}
                     , {field: 'createDateTime', title: '创建时间', width: 140, style: 'font-size: 12px;'}
                     , {field: 'updateDateTime', title: '修改时间', width: 140, style: 'font-size: 12px;'}
-                    , {fixed: '', width: 120, title: '操作', toolbar: '#table_bar'}
+                    , {fixed: 'right', width: 120, title: '操作', toolbar: '#table_bar'}
                 ]
             ]
             , id: 'table'
             , page: true
-            , limits: [3,5,10,15,20],
-            limit: 3
+            , limits: [5],
+            limit: 5
         });
 
         $("#BtnSearchUserInfo").on("click", function () {
             table.reload('table', {
-                page:{
-                    curr:1,
-                }
-                ,where: { //查询条件，传值到后台
+                where: { //查询条件，传值到后台
                     type: $("#type").val(),
                     content: $("#content").val(),
                 }
@@ -266,12 +245,6 @@
                 , layEvent = obj.event; //获得 lay-event 对应的值
             if (layEvent === 'edit') {
                 edit(data.id);
-            } else if (layEvent==='borrow') {
-                borrow(data.id);
-            }else if (layEvent==='return') {
-                book_return(data.id)
-            }else{
-
             }
         });
         //监听工具条 table_bar
@@ -297,15 +270,6 @@
 
     });
 </script>
-<style type="text/css">
-    .layui-table-cell {
-        height: auto;
-
-    }
-    .layui-icon{
-        margin-top: 5px;
-    }
-</style>
 
 
 </html>

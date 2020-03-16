@@ -1,9 +1,11 @@
 package com.java456.controller.houtai;
 
 import com.java456.dao.ManagerDao;
+import com.java456.dao.UserDao;
 import com.java456.entity.*;
 import com.java456.service.BookTypeService;
 import com.java456.service.RoleService;
+import com.java456.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
@@ -22,12 +24,15 @@ import java.util.Map;
 public class HouTai_User_Controller {
 	
 	@Resource
-	private ManagerDao managerDao;
+	private UserDao userDao;
 	@Resource
 	private RoleService roleService;
 
 	@Resource
 	private BookTypeService bookTypeService;
+
+	@Resource
+	private UserService userService;
 	
 	/**
 	 * /houtai/user/manage
@@ -75,9 +80,9 @@ public class HouTai_User_Controller {
 		mav.addObject("roleList", roleList);
 		
 		
-		
-		Manager manager = managerDao.findId(id);
-		mav.addObject("user", manager);
+//
+		User  user= userDao.findId(id);
+		mav.addObject("user", user);
 		mav.addObject("btn_text", "修改");
 		mav.addObject("save_url", "/admin/manager/update?id=" + id);
 		mav.setViewName("/admin/page/manager/add_update");
@@ -92,11 +97,11 @@ public class HouTai_User_Controller {
 	@RequestMapping("/set_new_pwd")
 	public ModelAndView set_new_pwd(@RequestParam(value = "id", required = false) Integer id) throws Exception {
 		ModelAndView mav = new ModelAndView();
-		Manager manager = managerDao.findId(id);
-		mav.addObject("user", manager);
+		User user = userDao.findId(id);
+		mav.addObject("user", user);
 		mav.addObject("btn_text", "修改");
-		mav.addObject("save_url", "/admin/manager/set_new_pwd?id=" + id);
-		mav.setViewName("/admin/page/manager/set_new_pwd");
+		mav.addObject("save_url", "/user/set_new_pwd?id=" + id);
+		mav.setViewName("/admin/page/user/set_new_user_pwd");
 		return mav;
 	}
 
@@ -120,6 +125,14 @@ public class HouTai_User_Controller {
 			return mav;
 //		}
 
+	}
+
+
+	@RequestMapping("/userlist")
+	public ModelAndView userlist(Model model){
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/admin/page/user/user");
+		return mav;
 	}
 
 

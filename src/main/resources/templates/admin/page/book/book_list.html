@@ -245,7 +245,9 @@
                 , layEvent = obj.event; //获得 lay-event 对应的值
             if (layEvent === 'edit') {
                 edit(data.id);
-            }
+            } else if (layEvent === 'borrow') {
+                borrow(data.id);
+            }else {}
         });
         //监听工具条 table_bar
 

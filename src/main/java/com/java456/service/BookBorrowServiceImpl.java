@@ -35,6 +35,9 @@ public class BookBorrowServiceImpl implements BookBorrowService {
             public Predicate toPredicate(Root<BookBorrow> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 Predicate predicate = cb.conjunction();
 
+                if(map.get("userId")!=null){
+                    predicate.getExpressions().add(cb.equal(root.get("uId"), map.get("userId")));
+                }
                 // 加入 等于
                 if (map.get("bookType") != null) {
                     predicate.getExpressions().add(cb.equal(root.get("bookType"), map.get("bookType")));
@@ -43,9 +46,7 @@ public class BookBorrowServiceImpl implements BookBorrowService {
                     predicate.getExpressions().add(cb.or(cb.like(root.get("author"),"%"+map.get("q")+"%"),
                             cb.like(root.get("name"),"%"+map.get("q")+"%"),cb.like(root.get("press"),"%"+map.get("q")+"%")));
                 }
-                if(map.get("userId")!=null){
-                    predicate.getExpressions().add(cb.equal(root.get("userId"), map.get("userId")));
-                }
+
 
                 return predicate;
             }
@@ -69,7 +70,7 @@ public class BookBorrowServiceImpl implements BookBorrowService {
 //                            cb.like(root.get("name"),"%"+map.get("q")+"%"),cb.like(root.get("press"),"%"+map.get("q")+"%")));
 //                }
                 if(map.get("userId")!=null){
-                    predicate.getExpressions().add(cb.equal(root.get("userId"), map.get("userId")));
+                    predicate.getExpressions().add(cb.equal(root.get("uId"), map.get("userId")));
                 }
                 return predicate;
             }
@@ -86,5 +87,10 @@ public class BookBorrowServiceImpl implements BookBorrowService {
     @Override
     public List<BookBorrow> findAll() {
         return null;
+    }
+
+    @Override
+    public void update(BookBorrow bookBorrow) {
+        bookBorrowDao.save(bookBorrow);
     }
 }

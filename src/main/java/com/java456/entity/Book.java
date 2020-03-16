@@ -64,6 +64,10 @@ public class Book {
     @NotNull(message="图书数量不能为空！")
 	@Column(length=10)
 	private Integer num;//图书数量
+
+	@Column(length=10)
+	private Integer state;//状态
+
 	@ManyToOne
 	@JoinColumn(name="bookTypeId")
 	private BookType bookType; // 图书类型
@@ -167,6 +171,14 @@ public class Book {
 
 	public void setIntroduce(String introduce) {
 		Introduce = introduce;
+	}
+
+	public Integer getState() {
+		return state;
+	}
+
+	public void setState(Integer state) {
+		this.state = state;
 	}
 
 	@Override

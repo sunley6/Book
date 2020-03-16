@@ -21,6 +21,7 @@ body {
 .login-box {
 	/* width: 435px; */
 	width: 470px;
+	height: 440px;
 	/* padding: 0 30px 35px 30px; */
 	padding: 0 0 35px 0;
 	color: #666;
@@ -65,7 +66,7 @@ function go_login() {
 		if (result.success) {
 			layer.closeAll();
 			console.log("dfdsfdsf");
-			window.location.href = "/user/main";
+			window.location.href = "/houtai/user/main";
 		} else {
 			layer.closeAll();
 			layer.msg(result.msg);
@@ -84,9 +85,9 @@ function reg(){
 	var password = $("#reg_password").val();
 	var trueName = $("#reg_trueName").val();
 	var phone = $("#reg_phone").val();
-	var orderNo = $("#reg_orderNo").val();
 	var mail = $("#reg_mail").val();
 	var cardID = $("#reg_cardID").val();
+	var sex = $("#reg_sex").val();
 	if (name == null || name == "") {
 		layer.closeAll();
 		layer.msg('请输入注册帐号!');
@@ -108,8 +109,8 @@ function reg(){
 		return;
 	}
 	
-	$.post('/user/add', {name : name,pwd : password,trueName:trueName,phone:phone,orderNo:orderNo,mail:mail
-		,cardID:cardID
+	$.post('/user/add', {name : name,pwd : password,trueName:trueName,phone:phone,mail:mail
+		,cardID:cardID,sex:sex
 	}, function(result) {
 		
 		if (result.success) {
@@ -228,15 +229,17 @@ function reg(){
 						</div>
 
 						<div class="layui-form-item">
-							<label class="layui-form-label" style="width: 75px;">排序号</label>
+							<label class="layui-form-label" style="width: 75px;">性别</label>
 							<div class="layui-input-block" style="margin-left: 110px;">
-								<input type="text" id="reg_orderNo" autocomplete="off"
-									   placeholder="排序号"
-									   class="layui-input">
+								<select  id="reg_sex"  >
+
+									<option th:value="男"   th:text="男"></option>
+									<option th:value="女"   th:text="女"></option>
+								</select>
 							</div>
 						</div>
-						
-						
+
+
 						<div class="layui-form-item">
 							<div class="layui-input-block" style="margin-left: 60px;">
 								<button class="layui-btn" onclick="reg()">提交注册</button>

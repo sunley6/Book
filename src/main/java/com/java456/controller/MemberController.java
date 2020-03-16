@@ -36,7 +36,7 @@ public class MemberController {
 	@RequestMapping("/a/login")
 	public ModelAndView login(HttpServletResponse  res,HttpServletRequest req) throws Exception {
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/pc/user/login");
+		mav.setViewName("/pc/member/login");
 		return mav;
 	}
 

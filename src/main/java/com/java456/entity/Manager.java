@@ -47,6 +47,12 @@ public class Manager {
 	@NotNull(message="真实姓名不能为空！")
 	@Column(length=200)
 	private  String trueName;
+
+	@Column(length=200)
+	private  String sex;
+
+	@Column(length=200)
+	private  String mail;
 	
 	
 	@Column(length=200)
@@ -149,6 +155,22 @@ public class Manager {
 
 	public void setCardID(String cardID) {
 		this.cardID = cardID;
+	}
+
+	public String getSex() {
+		return sex;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
 	}
 
 	@Override

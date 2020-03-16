@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <title th:text="${title}"></title>
-
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>layout 后台大布局 - Layui</title>
     <div th:include="/common/layui"></div>
     <div th:include="/common/jq"></div>
-
-    <!--添加 layui 自己的 css js  支持加载-->
     <link href="/css/houtai/manage_base.css" rel="stylesheet"/>
     <script src="/js/houtai/manage_base.js"></script>
-    <!--添加 layui 自己的 css js  支持加载-->
 
 </head>
-
 <script>
     //定义在外面。可以代码中  使用 table
     var table;
@@ -55,9 +51,11 @@
             shadeClose: false,
             shade: 0.8,
             area: [w + 'px', h + 'px'],
-            content: '/houtai/book/edit?id=' + id //iframe的url
+            content: '/houtai/book/booklook?id=' + id //iframe的url
         });
     }
+
+
 
     //子窗口调用 的  关闭窗口方法
     function closeDlg(msg) {
@@ -75,19 +73,6 @@
         });
     }
 
-    function borrow(id) {
-        w = 600;
-        h = 500;
-        checkWindow();
-        layer.open({
-            type: 2,
-            title: '修改',
-            shadeClose: false,
-            shade: 0.8,
-            area: [w + 'px', h + 'px'],
-            content: '/houtai/book/bookborrow?id=' + id //iframe的url
-        });
-    }
 
     //  delSelected()     5     2,25,6,5
     function del(ids) {
@@ -108,65 +93,71 @@
 
 
 </script>
-
-<body style="padding-top: 3px;">
-
-
-<script id="toolbardemo" type="text/html">
-    <div class="layui-table-toolbar" style="margin-bottom: 3px; ">
-        <div class="layui-btn-group">
-            <button onclick="add()" class="layui-btn layui-btn-sm"><i class="layui-icon">&#xe654;</i>添加</button>
-            <button onclick="delSelected()" class="layui-btn layui-btn-sm layui-btn-danger"><i class="layui-icon">&#xe640;</i>删除
-            </button>
-            <button class="layui-btn layui-btn-sm" onclick="reload_data()"><i class="layui-icon">&#xe669;</i>刷新</button>
-        </div>
-    </div>
-</script>
-
 <div style="width: 100% ; margin-top: 20px">
-    <div class="layui-input-inline" style="align-items: center">
-        <form class="layui-form">
-            <div class="layui-form-item">
-                <label class="layui-form-label" >搜索条件</label>
 
-                <div class="layui-input-inline">
-                    <select name="type" id="type" lay-filter="type">
-                        <option value="">请选择搜索类型</option>
-                        <option th:value="${type}" th:text="${type}" th:each="type: ${typelist}"></option>
-                    </select>
-                </div>
-                <div class="layui-input-inline">
-                    <input type="text" id="content" name="content" lay-verify="" placeholder="请输入搜索的信息"
-                           autocomplete="off" class="layui-input">
-                </div>
-                <button class="layui-btn" id="BtnSearchUserInfo" type="button"><i class="layui-icon"
-                                                                                  style="font-size: 18px;color:white;">&#xe615;</i>搜索
-                </button>
+
+        <div style="width: 100% ; margin-top: 20px">
+            <div class="layui-input-inline" style="align-items: center">
+                <form class="layui-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">搜索条件</label>
+                        <div class="layui-input-inline">
+                            <select name="type" id="type" lay-filter="type">
+                                <option value="">请选择搜索类型</option>
+                                <option th:value="${type}" th:text="${type}" th:each="type: ${typelist}"></option>
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <input type="text" id="content" name="content" lay-verify="" placeholder="请输入搜索的信息"
+                                   autocomplete="off" class="layui-input">
+                        </div>
+                        <button class="layui-btn" id="BtnSearchUserInfo" type="button"><i class="layui-icon"
+                                                                                          style="font-size: 18px;color:white;">&#xe615;</i>搜索
+                        </button>
+                    </div>
+                </form>
+
             </div>
-        </form>
-    </div>
+            <table class="layui-hide" id="table" lay-filter="table"></table>
+        </div>
+
+
+
 </div>
-<table class="layui-hide" id="table" lay-filter="table"></table>
-</body>
+
 
 <script type="text/html" id="table_bar">
+
     <div class="layui-btn-group">
-        <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">查看</a>
     </div>
+
     <div class="layui-btn-group">
-        <a class="layui-btn layui-btn-xs" lay-event="borrow">借阅</a>
+        <a class="layui-btn layui-btn-xs" lay-event="return">归还</a>
     </div>
 </script>
 
 <script type="text/html" id="format_type">
-    {{#  if(d.bookType){ }}
-    {{d.bookType.name}}
+    {{#  if(d.uId){ }}
+    {{d.uId.id}}
     {{#  } else {  }}
     空白
     {{#  }   }}
 </script>
+
+<script type="text/html" id="statustmp">
+    {{#  if(d.state===1){ }}
+    <span style="color: darkslategrey;">已借阅</span>
+    {{#  } else if(d.state===2) { }}
+    <span style="color:red;">待审核</span>
+    {{#  } else if(d.state===3) { }}
+    <span style="color:saddlebrown;">已预借</span>
+    {{#  } else  { }}
+    <span style="color:#18d26e">已归还</span>
+    {{#  }   }}
+</script>
 <script type="text/html" id="imgtmp">
-    <img src="{{d.imageUrl}}" >
+    <img src="{{d.bookImageUrl}}">
 </script>
 <script>
     layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel',
@@ -210,7 +201,7 @@
 
         table.render({
             elem: '#table'
-            , url: '/admin/book/list'
+            , url: '/admin/book/allborrow'
             , height: 'full-40'
             , toolbar: '#toolbardemo'
             , totalRow: true
@@ -222,36 +213,35 @@
             , cols: [
                 [
                     {checkbox: true}
-                    , {field: 'id', title: 'ID', width: 60, style: 'font-size: 12px;'}
-                    , {field: 'orderNo', title: '排序号', width: 60, style: 'font-size: 12px;'}
-                    , {field: 'bianhao', title: '图书编号', width: 90, style: 'font-size: 12px;'}
-                    , {field: 'name', title: '图书名称', width: 90, style: 'font-size: 12px;'}
-                    , {field: 'bookType', title: '图书类型', width: 90, style: 'font-size: 12px;', templet: '#format_type'}
-                    , {field: 'author', title: '作者', width: 90, style: 'font-size: 12px;'}
-                    , {field: 'danjia', title: '单价', width: 90, style: 'font-size: 12px;'}
-                    , {field: 'press', title: '出版社', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'id', title: 'ID', width: 40, style: 'font-size: 12px;'}
+                    , {field: 'uId', title: '用户Id', width: 90, style: 'font-size: 12px;', templet: '#format_type'}
+                    , {field: 'userName', title: '用户名称', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'userPhone', title: '联系方式', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'bookBianhao', title: '图书编号', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'bookName', title: '图书名称', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'bookType', title: '图书类型', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'bookAuthor', title: '作者', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'bookPress', title: '出版社', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'bookImageUrl', title: '封面图', width: 90, style: 'font-size: 12px;',templet: '#imgtmp'}
                     , {field: 'totalNum', title: '图书总数', width: 90, style: 'font-size: 12px;'}
                     , {field: 'num', title: '数量', width: 90, style: 'font-size: 12px;'}
                     , {field: 'bookLocation', title: '存放位置', width: 90, style: 'font-size: 12px;'}
                     , {field: 'introduce', title: '简介', width: 90, style: 'font-size: 12px;'}
-                    , {field: 'imageUrl', title: '封面图', width: 150, style: 'font-size: 12px;', templet: '#imgtmp'}
-                    , {field: 'createDateTime', title: '创建时间', width: 140, style: 'font-size: 12px;'}
-                    , {field: 'updateDateTime', title: '修改时间', width: 140, style: 'font-size: 12px;'}
-                    , {fixed: '', width: 120, title: '操作', toolbar: '#table_bar'}
+                    , {field: 'borrowCreateDateTime', title: '借阅时间', width: 140, style: 'font-size: 12px;'}
+                    , {field: 'borrowLastDateTime', title: '归还时间', width: 140, style: 'font-size: 12px;'}
+                    , {field: 'state', title: '归还时间', width: 140, style: 'font-size: 12px;', templet: '#statustmp'}
+                    , {fixed: '', width: 180, title: '操作', toolbar: '#table_bar'}
                 ]
             ]
             , id: 'table'
             , page: true
-            , limits: [3,5,10,15,20],
-            limit: 3
+            , limits: [5],
+            limit: 5
         });
 
         $("#BtnSearchUserInfo").on("click", function () {
             table.reload('table', {
-                page:{
-                    curr:1,
-                }
-                ,where: { //查询条件，传值到后台
+                where: { //查询条件，传值到后台
                     type: $("#type").val(),
                     content: $("#content").val(),
                 }
@@ -266,9 +256,13 @@
                 , layEvent = obj.event; //获得 lay-event 对应的值
             if (layEvent === 'edit') {
                 edit(data.id);
-            } else if (layEvent==='borrow') {
-                borrow(data.id);
-            }else if (layEvent==='return') {
+            }
+            else if (layEvent==='checkborroe') {
+                check_borrow(data.id);
+            } else if (layEvent==='sureborrow') {
+                sure_borrow(data.id);
+            }
+            else if (layEvent==='return') {
                 book_return(data.id)
             }else{
 
@@ -302,10 +296,13 @@
         height: auto;
 
     }
-    .layui-icon{
+
+    .layui-icon {
         margin-top: 5px;
     }
 </style>
 
 
+</body>
 </html>
+

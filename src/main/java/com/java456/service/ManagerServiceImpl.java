@@ -39,6 +39,16 @@ public class ManagerServiceImpl implements ManagerService {
 		if(curr.getRemark()==null){
 			curr.setRemark(origin.getRemark());
 		}
+
+		if(curr.getSex()==null){
+			curr.setSex(origin.getSex());
+		}
+		if(curr.getCardID()==null){
+			curr.setCardID(origin.getCardID());
+		}
+		if(curr.getMail()==null){
+			curr.setMail(origin.getMail());
+		}
 		
 		
 		if(curr.getOrderNo()==null){

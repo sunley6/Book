@@ -15,6 +15,7 @@ public interface BookDao extends JpaRepository<Book,Integer>,JpaSpecificationExe
 	
 	@Query(value="select * from t_book where id = ?1",nativeQuery = true)
 	public Book  findId(Integer id);
+
 	
 	@Query(value = "select * from t_book where name like %:name%",nativeQuery = true)
 	public List<Book> findByNameLike(@Param(value = "name") String name);

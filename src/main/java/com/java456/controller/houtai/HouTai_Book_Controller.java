@@ -74,9 +74,11 @@ public class HouTai_Book_Controller {
 		model.addAttribute("typelist",list1);
 
 		mav.addObject("title", "图书管理");
-		mav.setViewName("/pc/member/index");
+		mav.setViewName("/admin/page/book/borrowlist");
 		return mav;
 	}
+
+
 	/**
 	 * /houtai/book/add
 	 * @return
@@ -134,7 +136,7 @@ public class HouTai_Book_Controller {
 		Date date=new Date();
 		Book book = bookDao.findId(id);
 		mav.addObject("book", book);
-		System.out.println("book="+book.getImageUrl());
+
 //		mav.addObject("btn_text", "修改");
 //		mav.addObject("save_url", "/admin/book/update?id=" + id);
 		mav.setViewName("/pc/member/book_look");
@@ -160,10 +162,53 @@ public class HouTai_Book_Controller {
 		BookType bookType=book.getBookType();
 		System.out.println("bookType="+bookType.getName());
 		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("currentUser");
+		mav.addObject("id", id);
 		mav.addObject("bookType", bookType);
 		mav.addObject("book", book);
 		mav.addObject("btn_text", "添加");
 		mav.addObject("save_url", "/admin/book/bookborrow");
+		mav.setViewName("/pc/member/book_borrow");
+		return mav;
+	}
+
+
+	@RequestMapping("/preborrow")
+	public ModelAndView preborrow(@RequestParam(value = "id", required = false) Integer id) throws Exception {
+		System.out.println("id="+id);
+		ModelAndView mav = new ModelAndView();
+		Book book = bookDao.findId(id);
+		BookType bookType=book.getBookType();
+		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("currentUser");
+		mav.addObject("id", id);
+		mav.addObject("bookType", bookType);
+		mav.addObject("book", book);
+		mav.addObject("btn_text", "添加");
+		mav.addObject("save_url", "/admin/book/preborrow");
+		if (currentUser==null){
+			mav.setViewName("/common/nologin");
+			return mav;
+		}
+		else
+		{
+			mav.setViewName("/pc/member/book_preborrow");
+			return mav;
+		}
+	}
+
+
+
+
+
+
+
+	@RequestMapping("/bookcontinue")
+	public ModelAndView bookcontinue(@RequestParam(value = "id", required = false) Integer id) throws Exception {
+
+		ModelAndView mav = new ModelAndView();
+		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("currentUser");
+		mav.addObject("id",id);
+		mav.addObject("btn_text", "续借");
+		mav.addObject("save_url", "/admin/book/bookcontinue");
 
 		if (currentUser==null){
 			mav.setViewName("/common/nologin");
@@ -171,7 +216,7 @@ public class HouTai_Book_Controller {
 		}
 		else
 		{
-			mav.setViewName("/pc/member/book_borrow");
+			mav.setViewName("/pc/member/book_continue_borrow");
 			return mav;
 		}
 

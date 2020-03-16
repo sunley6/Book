@@ -30,6 +30,9 @@ public class User {
 	@Column(length=200)
 	private  String trueName;
 
+	@Column(length=200)
+	private  String sex;
+
 	@NotNull(message="电话")
 	@Column(length=200)
 	private  String phone;
@@ -43,22 +46,13 @@ public class User {
 
 	@Column(length=200)
 	private  String remark;
-	@NotNull(message="排序号不能为空！")
-	@Column(length=10)
-	private Integer orderNo;
+
 	@Temporal(TemporalType.TIMESTAMP) 
 	private Date createDateTime;//创建时间
 
 	@Column(length=200,columnDefinition = "int default 100")
 	private  Integer credit;
 
-	public Integer getOrderNo() {
-		return orderNo;
-	}
-
-	public void setOrderNo(Integer orderNo) {
-		this.orderNo = orderNo;
-	}
 
 	public Integer getId() {
 		return id;
@@ -143,20 +137,29 @@ public class User {
         this.cardID = cardID;
     }
 
-    @Override
+	public String getSex() {
+		return sex;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
+	@Override
 	public String toString() {
 		return "User{" +
 				"id=" + id +
 				", name='" + name + '\'' +
 				", pwd='" + pwd + '\'' +
 				", trueName='" + trueName + '\'' +
+				", sex='" + sex + '\'' +
 				", phone='" + phone + '\'' +
+				", cardID='" + cardID + '\'' +
 				", mail='" + mail + '\'' +
 				", remark='" + remark + '\'' +
-				", orderNo=" + orderNo +
+
 				", createDateTime=" + createDateTime +
 				", credit=" + credit +
 				'}';
 	}
-
 }

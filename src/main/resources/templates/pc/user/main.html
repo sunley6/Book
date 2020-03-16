@@ -4,8 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>layout 后台大布局 - Layui</title>
-    <div th:include="/common/layui"></div>
     <div th:include="/common/jq"></div>
+    <div th:include="/common/layui"></div>
+
     <link href="/css/houtai/manage_base.css" rel="stylesheet"/>
     <script src="/js/houtai/manage_base.js"></script>
 
@@ -55,7 +56,7 @@
         });
     }
 
-    function borrow(id) {
+    function preborrow(id) {
         w = 600;
         h = 500;
         checkWindow();
@@ -213,13 +214,7 @@
             elem: '#table'
             , url: '/admin/book/list'
             , height: 'full-40'
-            , toolbar: '#toolbardemo'
             , totalRow: true
-            , defaultToolbar: ['filter', 'exports', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
-                title: '提示'
-                , layEvent: 'LAYTABLE_TIPS'
-                , icon: 'layui-icon-tips'
-            }]
             , cols: [
                 [
 
@@ -238,8 +233,8 @@
             ]
             , id: 'table'
             , page: true
-            , limits: [5],
-            limit: 5
+            , limits: [5,10,15,20],
+            limit: 10
         });
 
         $("#BtnSearchUserInfo").on("click", function () {

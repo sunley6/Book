@@ -13,6 +13,6 @@ public class ConfigController implements WebMvcConfigurer {
     private String uploadPath;
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/upload/**").addResourceLocations("file:G:\\BookSystem14\\src\\main\\resources\\static\\upload\\");
+        registry.addResourceHandler("/upload/**").addResourceLocations("file:"+uploadPath);
     }
 }

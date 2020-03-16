@@ -6,9 +6,12 @@ import com.java456.dao.UserDao;
 import com.java456.entity.Manager;
 import com.java456.entity.Member;
 import com.java456.entity.User;
+import com.java456.service.BookTypeService;
 import com.java456.service.UserService;
 import com.java456.util.CryptographyUtil;
 import com.java456.util.MyUtil;
+import com.java456.util.StringUtil;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import net.sf.json.JSONObject;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -16,6 +19,7 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,6 +30,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -38,6 +45,9 @@ public class UserController {
 
 	@Resource
 	private UserService userService;
+
+	@Resource
+	private BookTypeService bookTypeService;
 
 
 	@Resource
@@ -103,7 +113,7 @@ public class UserController {
 						   HttpServletRequest request) throws Exception {
 		JSONObject result = new JSONObject();
 
-
+		System.out.println(user);
 		if (bindingResult.hasErrors()) {
 			result.put("success", false);
 			System.out.println(user.toString());
@@ -136,7 +146,10 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "myborrow")
-	public String f1(){
+	public String f1(Model model){
+		List<String> list1= bookTypeService.findAll();
+
+		model.addAttribute("typelist",list1);
 		return "pc/user/my_borrow";
 	}
 
@@ -163,7 +176,7 @@ public class UserController {
 
 	@ResponseBody
 	@RequestMapping("/update/password")
-	public JSONObject updatepassword(@RequestParam(value = "password", required = false) String passwprd,
+	public JSONObject updatepassword(@RequestParam(value = "password", required = false) String password,
 									 @RequestParam(value = "newPwd", required = false) String newPwd
 									 ) {
 		JSONObject result = new JSONObject();
@@ -175,22 +188,52 @@ public class UserController {
 //		}else{
 		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("currentUser");
 
-
-
-		System.out.println("password"+passwprd+"newped"+newPwd+"qqqq"+currentUser.getPwd());
-
-		if (CryptographyUtil.md5(passwprd, "java")!=currentUser.getPwd()){
+		if (!CryptographyUtil.md5(password, "java").equals(currentUser.getPwd())){
 			result.put("success", true);
 			result.put("msg", "原密码不正确");
 			return result;
 		}else {
+			currentUser.setPwd(CryptographyUtil.md5(newPwd, "java"));
+			userService.update(currentUser);
 			result.put("success", true);
 			result.put("msg", "修改成功");
 			return result;
 		}
-//		userService.update(currentUser);
 
-//		}
+	}
+
+
+	@ResponseBody
+	@RequestMapping("/userlist")
+	public Map<String, Object> list(@RequestParam(value = "page", required = false) Integer page,
+									@RequestParam(value = "limit", required = false) Integer limit,
+									HttpServletResponse response,
+									HttpServletRequest request) throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		List<User> userList = userService.list(map, page-1, limit);
+		long total = userService.getTotal(map);
+		map.put("data", userList);
+		map.put("count", total);
+		map.put("code", 0);
+		map.put("msg", "");
+		return map;
+	}
+
+
+	@ResponseBody
+	@RequestMapping("/set_new_pwd")
+	public JSONObject set_new_pwd(User user, HttpServletRequest request)throws Exception {
+		JSONObject result = new JSONObject();
+
+
+		if(StringUtil.isNotEmpty(user.getPwd())){
+			user.setPwd(CryptographyUtil.md5(user.getPwd(),"java"));
+		}
+		userService.update(user);
+		result.put("success", true);
+		result.put("msg", "修改成功");
+		return result;
 	}
 	
 }

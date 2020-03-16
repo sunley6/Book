@@ -15,4 +15,6 @@ public interface BookBorrowService {
     List<BookBorrow> findByUid(Integer id);
 
     List<BookBorrow> findAll();
+
+    void update(BookBorrow bookBorrow);
 }

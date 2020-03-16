@@ -33,23 +33,29 @@ public class UserServiceImpl implements UserService{
 		if(curr.getPwd()==null){
 			curr.setPwd(origin.getPwd());
 		}
+		if(curr.getPhone()==null){
+			curr.setPhone(origin.getPhone());
+		}
 		if(curr.getTrueName()==null){
 			curr.setTrueName(origin.getTrueName());
 		}
 		if(curr.getRemark()==null){
 			curr.setRemark(origin.getRemark());
 		}
+		if(curr.getSex()==null){
+			curr.setSex(origin.getSex());
+		}
 		if(curr.getCardID()==null){
-			curr.setRemark(origin.getCardID());
+			curr.setCardID(origin.getCardID());
 		}
 		if(curr.getMail()==null){
-			curr.setRemark(origin.getMail());
+			curr.setMail(origin.getMail());
 		}
 
-		
-		if(curr.getOrderNo()==null){
-			curr.setOrderNo(origin.getOrderNo());
+		if(curr.getCredit()==null){
+			curr.setCredit(origin.getCredit());
 		}
+
 		if(curr.getCreateDateTime()==null){
 			curr.setCreateDateTime(origin.getCreateDateTime());
 		}
@@ -61,9 +67,10 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public Integer update(User user) {
 		User origin = userDao.findId(user.getId());
+		System.out.println("origun="+origin);
 		//把没有值的数据  换成原数据库的数据。
 		user = repalce(user, origin);
-		
+		System.out.println(user.toString());
 		userDao.save(user);
 		return 1;
 	}

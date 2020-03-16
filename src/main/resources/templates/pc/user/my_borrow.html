@@ -55,19 +55,48 @@
         });
     }
 
-    function borrow(id) {
+    function book_continue(id) {
         w = 600;
         h = 500;
         checkWindow();
         layer.open({
             type: 2,
-            title: '修改',
+            title: '续借',
             shadeClose: false,
             shade: 0.8,
             area: [w + 'px', h + 'px'],
-            content: '/houtai/book/bookborrow?id=' + id //iframe的url
+            content: '/houtai/book/bookcontinue?id=' + id //iframe的url
         });
     }
+    function book_return(id) {
+
+        $.post('/admin/book/bookreturn', {'id':id
+        }, function (result) {
+            if (result.success) {
+                window.parent.closeDlg(result.msg);
+            } else {
+                layer.msg(result.msg);
+            }
+        }, 'json');
+    }
+
+
+
+
+
+    // function borrow(id) {
+    //     w = 600;
+    //     h = 500;
+    //     checkWindow();
+    //     layer.open({
+    //         type: 2,
+    //         title: '修改',
+    //         shadeClose: false,
+    //         shade: 0.8,
+    //         area: [w + 'px', h + 'px'],
+    //         content: '/houtai/book/bookborrow?id=' + id //iframe的url
+    //     });
+    // }
 
     //子窗口调用 的  关闭窗口方法
     function closeDlg(msg) {
@@ -123,10 +152,10 @@
                                 <option th:value="${type}" th:text="${type}" th:each="type: ${typelist}"></option>
                             </select>
                         </div>
-                        <div class="layui-input-inline">
-                            <input type="text" id="content" name="content" lay-verify="" placeholder="请输入搜索的信息"
-                                   autocomplete="off" class="layui-input">
-                        </div>
+<!--                        <div class="layui-input-inline">-->
+<!--                            <input type="text" id="content" name="content" lay-verify="" placeholder="请输入搜索的信息"-->
+<!--                                   autocomplete="off" class="layui-input">-->
+<!--                        </div>-->
                         <button class="layui-btn" id="BtnSearchUserInfo" type="button"><i class="layui-icon"
                                                                                           style="font-size: 18px;color:white;">&#xe615;</i>搜索
                         </button>
@@ -150,11 +179,9 @@
         <a class="layui-btn layui-btn-xs" lay-event="edit">查看</a>
     </div>
     <div class="layui-btn-group">
-        <a class="layui-btn layui-btn-xs" lay-event="borrow">借阅</a>
+        <a class="layui-btn layui-btn-xs" lay-event="continue">续借</a>
     </div>
-    <div class="layui-btn-group">
-        <a class="layui-btn layui-btn-xs" lay-event="pre_borrow">预借</a>
-    </div>
+
 </script>
 
 
@@ -163,7 +190,7 @@
     {{#  if(d.bookType){ }}
     {{d.bookType.name}}
     {{#  } else {  }}
-    <span style="color: #f53e3d;">待审核</span>
+    <span style="color: #f53e3d;"></span>
     {{#  }   }}
 </script>
 
@@ -176,6 +203,8 @@
     <span style="color:saddlebrown;">已预借</span>
     {{#  } else  { }}
     <span style="color:#18d26e">已归还</span>
+    else if(d.state===5) { }}
+    <span style="color:aqua;">已续借</span>
     {{#  }   }}
 </script>
 <script type="text/html" id="imgtmp">
@@ -225,27 +254,22 @@
             elem: '#table'
             , url: '/admin/book/myborrow'
             , height: 'full-40'
-            , toolbar: '#toolbardemo'
+
             , totalRow: true
-            , defaultToolbar: ['filter', 'exports', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
-                title: '提示'
-                , layEvent: 'LAYTABLE_TIPS'
-                , icon: 'layui-icon-tips'
-            }]
+
             , cols: [
                 [
-                    {checkbox: true}
-                    , {field: 'bookBianhao', title: '图书编号', width: 90, style: 'font-size: 12px;'}
+
+                     {field: 'bookBianhao', title: '图书编号', width: 90, style: 'font-size: 12px;'}
                     , {field: 'bookName', title: '图书名称', width: 90, style: 'font-size: 12px;'}
                     , {field: 'bookType', title: '图书类型', width: 90, style: 'font-size: 12px;'}
                     , {field: 'bookAuthor', title: '作者', width: 90, style: 'font-size: 12px;'}
                     , {field: 'bookPress', title: '出版社', width: 90, style: 'font-size: 12px;'}
-                    , {field: 'totalNum', title: '图书总数', width: 90, style: 'font-size: 12px;'}
-                    , {field: 'num', title: '数量', width: 90, style: 'font-size: 12px;'}
+                    , {field: 'num', title: '数量', width: 80, style: 'font-size: 12px;'}
                     , {field: 'borrowCreateDateTime', title: '借阅时间', width: 140, style: 'font-size: 12px;'}
                     , {field: 'borrowLastDateTime', title: '归还时间', width: 140, style: 'font-size: 12px;'}
-                    , {field: 'state', title: '归还时间', width: 140, style: 'font-size: 12px;' ,templet: '#statustmp'}
-                    , {fixed: '', width: 120, title: '操作', toolbar: '#table_bar'}
+                    , {field: 'state', title: '状态', width: 100, style: 'font-size: 12px;' ,templet: '#statustmp'}
+                    , {fixed: '', width: 180, title: '操作', toolbar: '#table_bar'}
                 ]
             ]
             , id: 'table'
@@ -270,28 +294,35 @@
             var data = obj.data //获得当前行数据
                 , layEvent = obj.event; //获得 lay-event 对应的值
             if (layEvent === 'edit') {
-                edit(data.id);
+
+                edit(data.bookId);
+            }else if (layEvent==='continue') {
+                book_continue(data.id);
+            }else if (layEvent==='return') {
+                book_return(data.id)
+            }else{
+
             }
         });
         //监听工具条 table_bar
 
 
-        //监听单元格编辑
-        table.on('edit(table)', function (obj) {
-            var value = obj.value //得到修改后的值
-                , data = obj.data //得到所在行所有键值
-                , field = obj.field; //得到字段  orderNo  name
-            //layer.msg('[ID: '+ data.id +'] ' + field + ' 字段更改为：'+ value);
-            table_edit_update(data.id, field, value);
-        });
-
-        table.on('checkbox(table)', function (obj) {
-            var checkStatus = table.checkStatus('table'); //idTest 即为基础参数 id 对应的值
-            console.log(obj);
-
-            console.log(checkStatus);
-
-        })
+        // //监听单元格编辑
+        // table.on('edit(table)', function (obj) {
+        //     var value = obj.value //得到修改后的值
+        //         , data = obj.data //得到所在行所有键值
+        //         , field = obj.field; //得到字段  orderNo  name
+        //     //layer.msg('[ID: '+ data.id +'] ' + field + ' 字段更改为：'+ value);
+        //     table_edit_update(data.id, field, value);
+        // });
+        //
+        // table.on('checkbox(table)', function (obj) {
+        //     var checkStatus = table.checkStatus('table'); //idTest 即为基础参数 id 对应的值
+        //     console.log(obj);
+        //
+        //     console.log(checkStatus);
+        //
+        // })
 
 
     });
