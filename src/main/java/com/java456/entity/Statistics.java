@@ -49,7 +49,10 @@ public class Statistics {
     private String Introduce; //简介
 
     @Column(length=10)
-    private Integer state;//状态
+    private Integer state;//进库状态
+
+    @Column(length=10)
+    private Integer state1;//出库状态
 
 
     @NotNull(message="排序号不能为空！")
@@ -179,6 +182,14 @@ public class Statistics {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public Integer getState1() {
+        return state1;
+    }
+
+    public void setState1(Integer state1) {
+        this.state1 = state1;
     }
 
     @Override

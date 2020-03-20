@@ -163,10 +163,11 @@ public class UserController {
 //			result.put("msg", bindingResult.getFieldError().getDefaultMessage());
 //			return result;
 //		}else{
+
 		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("currentUser");
 		currentUser.setMail(user.getMail());
 		currentUser.setRemark(user.getRemark());
-		currentUser.setPhone(currentUser.getPhone());
+		currentUser.setPhone(user.getPhone());
 			userService.update(currentUser);
 			result.put("success", true);
 			result.put("msg", "修改成功");

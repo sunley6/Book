@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public List<User> list(Map<String, Object> map, Integer page, Integer pageSize) {
-		Pageable pageable=new PageRequest(page, pageSize, Sort.Direction.DESC,"orderNo");
+		Pageable pageable=new PageRequest(page, pageSize, Sort.Direction.DESC,"id");
 		Page<User> list = userDao.findAll(pageable);
 		List<User> users = list.getContent();//拿到list集合
 		return users;//拿到list集合

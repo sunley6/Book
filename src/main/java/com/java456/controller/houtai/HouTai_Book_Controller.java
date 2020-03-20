@@ -153,6 +153,19 @@ public class HouTai_Book_Controller {
 		return mav;
 	}
 
+	@RequestMapping("/total")
+	public ModelAndView total(Model model) throws Exception {
+		ModelAndView mav = new ModelAndView();
+
+		List<String> list1= bookTypeService.findAll();
+
+		model.addAttribute("typelist",list1);
+		mav.addObject("title", "图书出入库");
+		mav.setViewName("/admin/page/book/book_total");
+		return mav;
+	}
+
+
 	@RequestMapping("/bookborrow")
 	public ModelAndView bookborrow(@RequestParam(value = "id", required = false) Integer id) throws Exception {
 		System.out.println("id="+id);

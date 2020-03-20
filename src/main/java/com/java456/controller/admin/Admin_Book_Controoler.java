@@ -9,13 +9,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.java456.dao.*;
 import com.java456.entity.*;
 import com.java456.service.BookBorrowService;
 import com.java456.service.BookTypeService;
 
+import com.java456.service.StatisticsService;
 import com.java456.util.GetDate;
 import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -50,6 +53,9 @@ public class Admin_Book_Controoler {
 	private BookBorrowService bookBorrowService;
 
 	@Resource
+	private StatisticsService statisticsService;
+
+	@Resource
 	private BookTypeService bookTypeService;
 
 	@Resource
@@ -76,6 +82,7 @@ public class Admin_Book_Controoler {
 			System.out.println("book="+book.toString());
 			bookDao.save(book);
 			statistics.setState(1);
+			statistics.setCreateDateTime(new Date());
 			statisticsDao.save(statistics);
 			result.put("success", true);
 			result.put("msg", "添加成功");
@@ -150,6 +157,46 @@ public class Admin_Book_Controoler {
 		return map;
 	}
 
+	@ResponseBody
+	@RequestMapping("/total")
+	public Map<String, Object> total(@RequestParam(required = false,defaultValue = "0") String type,
+									@RequestParam(required = false,defaultValue = "") String content,
+									@RequestParam(value = "page", required = false) Integer page,
+									@RequestParam(value = "limit", required = false) Integer limit,
+									Model model,
+									HttpServletResponse response,
+									HttpServletRequest request) throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+		System.out.println("type="+type+"content="+content+"page="+page+"limit="+limit);
+//		BookType bookType=bookTypeService.findByName(type);
+		List<Statistics> list = new ArrayList<>();
+//		if (bookType!=null){
+//			map.put("bookType",bookType.getId());
+//			list = bookService.list(map, page-1, limit);
+//
+//			System.out.println(1111);
+//		}else if (!"".equals(content)){
+//			map.put("q",content);
+//			list = bookService.list(map, page-1, limit);
+//			System.out.println(2222);
+//		}
+//		else {
+			list = statisticsService.list(map, page-1, limit);
+			System.out.println(3333);
+//		}
+		System.out.println("page="+list);
+		System.out.println("page="+page);
+
+		long total = statisticsService.getTotal(map);
+		System.out.println("size"+list.size()+"      "+total);
+		map.put("data", list);
+		map.put("count", total);
+		map.put("code", 0);
+		map.put("msg", "");
+
+		return map;
+	}
+
 
 	/**
 	 * /admin/book/delete
@@ -168,11 +215,11 @@ public class Admin_Book_Controoler {
 
 			Book book=bookDao.findId(Integer.parseInt(idsStr[i]));
 			Statistics statistics=statisticsDao.findId(book.getBianhao());
-			statistics.setState(0);
+			statistics.setState1(1);
+			statistics.setUpdateDateTime(new Date());
 			System.out.println(statistics);
 			statisticsDao.save(statistics);
 			bookDao.deleteById(Integer.parseInt(idsStr[i]));
-
 
 		}
 		result.put("success", true);
@@ -192,6 +239,7 @@ public class Admin_Book_Controoler {
 		Date date=getDate.getlastdate(datenum);
 		Book book=bookDao.findId(id);
 		User user=userDao.findByPhone(userPhone);
+		System.out.println(user);
 		BookBorrow bookBorrow=new BookBorrow(user,book,new Date(),date,1);
 		BookBorrow bookBorrow1=bookBorrowDao.findIdUid(id,user.getId(),5);
 //		if (currentUser==null){
@@ -208,7 +256,11 @@ public class Admin_Book_Controoler {
 			result.put("success", false);
 			result.put("msg", "书籍已借阅");
 			return result;
-		}
+		}else if (user==null){
+				result.put("success", false);
+				result.put("msg", "该用户不存在");
+				return result;
+			}
 		else if (user.getCredit()<70){
 			result.put("success", false);
 			result.put("msg", "信用分不足");
@@ -239,6 +291,9 @@ public class Admin_Book_Controoler {
 		Book book=bookDao.findId(bookBorrow.getBookId());
 		User currentUser = userDao.findId(bookBorrow.getuId().getId());
 		BookBorrow bookBorrow1=bookBorrowDao.findIdUid(bookBorrow.getBookId(),currentUser.getId(),5);
+		List<BookBorrow> alllist = new ArrayList<>();
+		alllist=bookBorrowDao.findByUId(bookBorrow.getuId().getId());
+
 		if (currentUser==null){
 			result.put("success", false);
 			result.put("msg", "请先登录");
@@ -247,6 +302,10 @@ public class Admin_Book_Controoler {
 		if (book.getNum()<1){
 			result.put("success", false);
 			result.put("msg", "数量不足");
+			return result;
+		}else if (getDate.overflag(alllist)==0){
+			result.put("success", false);
+			result.put("msg", "有过期图书为归还");
 			return result;
 		}
 		else if (bookBorrow1!=null){

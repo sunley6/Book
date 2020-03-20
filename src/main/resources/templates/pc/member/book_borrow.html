@@ -31,10 +31,6 @@
         var datenum = $("#datenum").val();
         var n1=$("#bookType").val();
         $.post(save_url, {
-            // bookName: app.bookName, orderNo: app.orderNo, bookPress: app.bookPress,num:app.num,bookId:app.bookId,
-            // bookLocation: app.bookLocation, bookAuthor: app.bookAuthor, bookBianhao: app.bookBianhao
-            // , bookType: app.bookType, introduce: app.introduce, bookImageUrl: app.bookImageUrl
-            // , uId: app.uId,  userName: app.userName,
             userPhone: app.userPhone,'datenum':datenum,'id':id
         }, function (result) {
             if (result.success) {

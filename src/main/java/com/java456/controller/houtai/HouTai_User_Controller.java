@@ -41,8 +41,8 @@ public class HouTai_User_Controller {
 	@RequestMapping("/manage")
 	public ModelAndView manage() throws Exception {
 		ModelAndView mav = new ModelAndView();
-		mav.addObject("pageTitle", "用户管理");
-		mav.addObject("title", "用户管理");
+		mav.addObject("pageTitle", "管理员管理");
+		mav.addObject("title", "管理员管理");
 		mav.setViewName("/admin/page/user/user_manage");
 		return mav;
 	}
@@ -129,8 +129,10 @@ public class HouTai_User_Controller {
 
 
 	@RequestMapping("/userlist")
-	public ModelAndView userlist(Model model){
+	public ModelAndView user() throws Exception {
 		ModelAndView mav = new ModelAndView();
+		mav.addObject("pageTitle", "用户管理");
+		mav.addObject("title", "用户管理");
 		mav.setViewName("/admin/page/user/user");
 		return mav;
 	}
